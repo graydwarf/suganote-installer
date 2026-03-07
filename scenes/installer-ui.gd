@@ -131,10 +131,11 @@ func _on_upgrade_completed(success: bool, message: String) -> void:
 
 func _build_ui() -> void:
 	# Window setup
-	get_window().title = "Installer"
-	get_window().size = Vector2i(520, 268)
-	get_window().min_size = Vector2i(520, 268)
-	get_window().max_size = Vector2i(520, 268)
+	var win = get_window()
+	win.title = "Installer"
+	win.size = Vector2i(520, 268)
+	win.min_size = Vector2i(520, 268)
+	win.max_size = Vector2i(520, 268)
 
 	# Fill parent so children use full window width
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -378,7 +379,7 @@ func _apply_button_style(button: Button, is_primary: bool = false) -> void:
 
 func _on_browse_pressed() -> void:
 	# Use native OS folder picker (opens as a separate system window)
-	var dialog = DisplayServer.file_dialog_show(
+	var _dialog = DisplayServer.file_dialog_show(
 		"Choose Install Location",
 		_path_edit.text if _path_edit.text != "" else OS.get_environment("LOCALAPPDATA"),
 		"",

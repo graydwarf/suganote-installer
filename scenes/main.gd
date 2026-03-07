@@ -73,6 +73,12 @@ func _on_install_location_chosen(install_dir: String) -> void:
 	_version_fetcher.fetch_latest(_config.version_check_url, _config.version_check_api_key)
 
 func _on_version_fetched_for_install(version_info: Dictionary) -> void:
+	var download_url = version_info.get("download_url", "")
+	if download_url == "":
+		_ui._status_label.text = "No Release Available"
+		_ui._detail_label.text = "There are no published releases yet. Check back later."
+		return
+
 	_upgrade_manager = UpgradeManager.new()
 	add_child(_upgrade_manager)
 	_ui.bind_upgrade_manager(_upgrade_manager)
