@@ -29,7 +29,7 @@ func _ready() -> void:
 	_cli.parse()
 
 	# Create UI
-	_ui = preload("res://addons/godot-installer/scenes/installer-ui.gd").new()
+	_ui = preload("res://scenes/installer-ui.gd").new()
 	add_child(_ui)
 	_ui.setup(_config)
 
