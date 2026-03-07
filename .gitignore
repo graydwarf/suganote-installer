@@ -1,0 +1,18 @@
+# Godot editor cache
+.godot/
+
+# License config with real keys
+license-config.json
+
+# Import files
+*.import
+
+# UID files
+*.uid
+
+# Temp files
+*.tmp
+*~
+
+# Export builds
+exports/
