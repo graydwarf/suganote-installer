@@ -1,0 +1,7 @@
+{
+  "app_name": "MyApp",
+  "exe_name": "MyApp.exe",
+  "pck_name": "MyApp.pck",
+  "accent_color": [0.3, 0.6, 1.0],
+  "logo_path": "res://assets/logo.png"
+}

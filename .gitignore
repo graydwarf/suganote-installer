@@ -1,8 +1,9 @@
 # Godot editor cache
 .godot/
 
-# License config with real keys
+# Build-time configs (created by CI from secrets/variables)
 license-config.json
+app-config.json
 
 # Import files
 *.import

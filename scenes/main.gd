@@ -11,15 +11,9 @@ var _version_fetcher: VersionFetcher
 
 func _ready() -> void:
 	_config = InstallerConfig.new()
-	_config.app_name = "Suganote"
-	_config.exe_name = "Suganote.exe"
-	_config.pck_name = "Suganote.pck"
-	_config.accent_color = Color(0.3, 0.6, 1.0)
 
-	# Load logo
-	var logo = load("res://assets/suganote-logo.png")
-	if logo:
-		_config.logo_texture = logo
+	# Load app identity from app-config.json (created by CI or from template)
+	_load_app_config()
 
 	# Load version check config
 	_load_license_config()
@@ -40,6 +34,36 @@ func _ready() -> void:
 			_start_upgrade()
 		InstallerCLI.Mode.ROLLBACK:
 			_start_rollback()
+
+# Reads app identity (name, exe, logo, colors) from app-config.json
+func _load_app_config() -> void:
+	var config_path = "res://app-config.json"
+	if not FileAccess.file_exists(config_path):
+		push_warning("app-config.json not found — using defaults")
+		return
+	var file = FileAccess.open(config_path, FileAccess.READ)
+	if not file:
+		return
+	var json = JSON.new()
+	if json.parse(file.get_as_text()) != OK:
+		return
+	var data = json.data
+	if data is not Dictionary:
+		return
+
+	_config.app_name = data.get("app_name", _config.app_name)
+	_config.exe_name = data.get("exe_name", _config.exe_name)
+	_config.pck_name = data.get("pck_name", _config.pck_name)
+
+	var color_arr = data.get("accent_color", [])
+	if color_arr is Array and color_arr.size() >= 3:
+		_config.accent_color = Color(color_arr[0], color_arr[1], color_arr[2])
+
+	var logo_path = data.get("logo_path", "")
+	if logo_path != "":
+		var logo = load(logo_path)
+		if logo:
+			_config.logo_texture = logo
 
 func _load_license_config() -> void:
 	var config_path = "res://license-config.json"

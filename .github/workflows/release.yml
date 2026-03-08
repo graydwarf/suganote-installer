@@ -21,7 +21,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          token: ${{ secrets.PRIVATE_REPOS_TOKEN }}
 
       - name: Extract version from tag
         id: version
@@ -30,6 +29,18 @@ jobs:
           VERSION="${TAG#v}"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Create app-config.json from variables
+        run: |
+          cat > app-config.json <<EOF
+          {
+            "app_name": "${{ vars.APP_NAME || 'MyApp' }}",
+            "exe_name": "${{ vars.APP_EXE_NAME || 'MyApp.exe' }}",
+            "pck_name": "${{ vars.APP_PCK_NAME || 'MyApp.pck' }}",
+            "accent_color": [0.3, 0.6, 1.0],
+            "logo_path": "res://assets/suganote-logo.png"
+          }
+          EOF
 
       - name: Create license-config.json from secrets
         if: ${{ vars.SUPABASE_LICENSE_URL != '' }}
