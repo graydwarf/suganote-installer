@@ -107,7 +107,7 @@ func _on_upgrade_completed(success: bool, message: String) -> void:
 	_cancel_button.visible = false
 
 	if success:
-		_result_icon.text = "OK"
+		_result_icon.text = "✓"
 		_result_icon.add_theme_color_override("font_color", Color(0.4, 0.9, 0.4))
 		_status_label.text = "Success!"
 		_detail_label.text = message
@@ -116,10 +116,15 @@ func _on_upgrade_completed(success: bool, message: String) -> void:
 		var timer = get_tree().create_timer(3.0)
 		timer.timeout.connect(func(): get_tree().quit())
 	else:
-		_result_icon.text = "!"
+		_result_icon.text = "✕"
 		_result_icon.add_theme_color_override("font_color", Color(0.9, 0.3, 0.3))
 		_status_label.text = "Failed"
 		_detail_label.text = message
+		_detail_label.add_theme_color_override("font_color", Color(0.75, 0.6, 0.6))
+
+		# Grow window to fit error detail
+		var win = get_window()
+		win.size = Vector2i(520, 320)
 
 		# Show close button
 		_action_button.text = "Close"
@@ -134,8 +139,8 @@ func _build_ui() -> void:
 	var win = get_window()
 	win.title = "Installer"
 	win.size = Vector2i(520, 268)
-	win.min_size = Vector2i(520, 268)
-	win.max_size = Vector2i(520, 268)
+	win.min_size = Vector2i(520, 200)
+	win.max_size = Vector2i(520, 400)
 
 	# Fill parent so children use full window width
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -177,21 +182,32 @@ func _build_ui() -> void:
 	_title_label.add_theme_color_override("font_color", Color(0.9, 0.92, 0.95))
 	header.add_child(_title_label)
 
-	# Result icon (hidden by default)
+	# Status row: result icon + status label inline
+	var status_row = HBoxContainer.new()
+	status_row.add_theme_constant_override("separation", 10)
+	vbox.add_child(status_row)
+
 	_result_icon = Label.new()
 	_result_icon.text = "OK"
-	_result_icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_result_icon.add_theme_font_size_override("font_size", 36)
+	_result_icon.add_theme_font_size_override("font_size", 20)
 	_result_icon.visible = false
-	vbox.add_child(_result_icon)
+	status_row.add_child(_result_icon)
 
-	# Status label
 	_status_label = Label.new()
 	_status_label.text = "Preparing..."
 	_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_status_label.add_theme_font_size_override("font_size", 16)
 	_status_label.add_theme_color_override("font_color", Color(0.85, 0.87, 0.9))
-	vbox.add_child(_status_label)
+	status_row.add_child(_status_label)
+
+	# Detail label (right after status so it's always visible)
+	_detail_label = Label.new()
+	_detail_label.text = ""
+	_detail_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_detail_label.add_theme_font_size_override("font_size", 12)
+	_detail_label.add_theme_color_override("font_color", Color(0.6, 0.62, 0.65))
+	_detail_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(_detail_label)
 
 	# Install path row (for first install)
 	_path_container = HBoxContainer.new()
@@ -274,14 +290,7 @@ func _build_ui() -> void:
 	_progress_bar.add_theme_stylebox_override("background", bar_bg)
 	vbox.add_child(_progress_bar)
 
-	# Detail label (below progress bar)
-	_detail_label = Label.new()
-	_detail_label.text = ""
-	_detail_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_detail_label.add_theme_font_size_override("font_size", 12)
-	_detail_label.add_theme_color_override("font_color", Color(0.6, 0.62, 0.65))
-	_detail_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	vbox.add_child(_detail_label)
+	# (Detail label is added earlier, right after status row)
 
 # Sets the required space from the version API and shows space info
 func set_required_space(size_bytes: int) -> void:
